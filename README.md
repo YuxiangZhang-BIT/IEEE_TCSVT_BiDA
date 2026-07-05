@@ -1,11 +1,115 @@
-# Cross-domain Hyperspectral Image Classification based on Bi-directional Domain Adaptation
+<h1 align="center"><a href="https://ieeexplore.ieee.org/abstract/document/11072185" style="color:#9C276A">
+Cross-domain Hyperspectral Image Classification based on Bi-directional Domain Adaptation</a></h1>
+<h4 align="center"> If our project helps you, please give us a star ⭐ on GitHub to support us.</h4>
 
-# Abstract
+<div align="center">
 
-Utilizing hyperspectral remote sensing technology enables the extraction of fine-grained land cover classes. Typically, satellite or airborne images used for training and testing are acquired from different regions or times, where the same class has significant spectral shifts in different scenes. In this paper, we propose a Bi-directional Domain Adaptation (BiDA) framework for cross-domain hyperspectral image (HSI) classification, which focuses on extracting both domain-invariant features and domain-specific information in the independent adaptive space, thereby enhancing the adaptability and separability to the target scene. In the proposed BiDA, a triple-branch transformer architecture (the source branch, target branch, and coupled branch) with semantic tokenizer is designed as the backbone. Specifically, the source branch and target branch independently learn the adaptive space of source and target domains, a Coupled Multi-head Cross-attention (CMCA) mechanism is developed in coupled branch for feature interaction and inter-domain correlation mining. Furthermore, a bi-directional distillation loss is designed to guide adaptive space learning using inter-domain correlation. Finally, we propose an Adaptive Reinforcement Strategy (ARS) to encourage the model to focus on specific generalized feature extraction within both source and target scenes in noise condition. Experimental results on cross-temporal/scene airborne and satellite datasets demonstrate that the proposed BiDA performs significantly better than some state-of-the-art domain adaptation approaches. In the cross-temporal tree species classification task, the proposed BiDA is more than 3%~5% higher than the most advanced method.
+[[Paper 📰]](https://ieeexplore.ieee.org/abstract/document/11072185) [[Datasets 🤗]](https://github.com/YuxiangZhang-BIT/Data-CSHSI)
+
+</div>
+
+## Overview
+
+This repository provides a PyTorch implementation of **Cross-Domain Hyperspectral Image Classification Based on Bi-Directional Domain Adaptation (BiDA)** for cross-temporal and cross-scene hyperspectral image classification.
+
 ![Method](assets/BiDA.png "Method")
 
+## Environment Setup
 
-Paper: **coming soon**
+### 1. Create a Python environment
 
-Code: **coming soon**
+Python 3.9+ is recommended.
+
+```bash
+conda create -n bida python=3.10 -y
+conda activate bida
+```
+
+### 2. Install PyTorch
+
+Please install PyTorch according to your CUDA version from the official guide:
+
+https://pytorch.org/get-started/locally/
+
+Example (CUDA 12.1):
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+### 3. Install the remaining dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Data Preparation
+
+The default entry script runs the Houston cross-temporal task. Default arguments in `main.py` are:
+
+- `source_name=Houston13`
+- `target_name=Houston18`
+- `dataset_dir=./Houston/`
+
+Please organize the dataset as follows (for the default configuration):
+
+```text
+./Houston/
+├── Houston13.mat
+├── Houston13_7gt.mat
+├── Houston18.mat
+└── Houston18_7gt.mat
+```
+
+The `.mat` files should include the keys expected by the loader:
+
+- `Houston13.mat` / `Houston18.mat`: `ori_data`
+- `Houston13_7gt.mat` / `Houston18_7gt.mat`: `map`
+
+## Training and Evaluation
+
+```bash
+python main.py \
+	--model BiDA \
+	--source_name Houston13 \
+	--target_name Houston18 \
+	--dataset_dir ./Houston/ \
+	--device 0 \
+	--epoch 200 \
+	--bs 128 \
+	--lr 1e-2 \
+	--patch_size 13 \
+	--depth 3 \
+	--num_tokens 4 \
+	--seed 2100
+```
+
+Typical artifacts:
+
+- `model_ts_best*.pth`: model checkpoint with best OA
+- `results_*.mat`: statistics including OA and confusion matrix
+
+## Key Arguments
+
+- `--ratio`: source-domain train/validation split ratio (default: `0.95`)
+- `--lambda1`: weight for alignment and distillation losses (default: `1e-1`)
+- `--lambda2`: weight for consistency loss (default: `1e+0`)
+- `--ema_decay`: EMA decay factor (default: `0.999`)
+- `--re_ratio`: source-domain repetition ratio (default: `1`)
+
+## Citation
+
+If this repository is useful for your research, please cite:
+
+```bibtex
+@ARTICLE{11072185,
+	author={Zhang, Yuxiang and Li, Wei and Jia, Wen and Zhang, Mengmeng and Tao, Ran and Liang, Shunlin},
+	journal={IEEE Transactions on Circuits and Systems for Video Technology},
+	title={Cross-Domain Hyperspectral Image Classification Based on Bi-Directional Domain Adaptation},
+	year={2025},
+	volume={35},
+	number={12},
+	pages={12038-12051},
+	doi={10.1109/TCSVT.2025.3586282}
+}
+```

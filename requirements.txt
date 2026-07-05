@@ -1,0 +1,9 @@
+numpy>=1.23
+scipy>=1.10
+scikit-learn>=1.2
+tqdm>=4.65
+einops>=0.7
+spectral>=0.23
+matplotlib>=3.7
+imageio>=2.31
+tifffile>=2023.7.10
